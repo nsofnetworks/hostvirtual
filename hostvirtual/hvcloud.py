@@ -50,7 +50,7 @@ class HVCloud(object):
     @property
     def packages(self):
         '''List all packages'''
-        # lazy evaluation; cached during self's lifetime
+        # lazy evaluation; cached
         if not self._packages:
             self._packages = self.request('GET', '/cloud/packages')
         return self._packages
@@ -62,6 +62,24 @@ class HVCloud(object):
                     pkg.get('package') is None and
                     pkg.get('state') is None)
         return (p for p in self.packages if _is_available(p))
+
+    def package_buy(self, plan):
+        '''Buy a server billing package'''
+        self._packages = None  # clear cache
+        ep = '/cloud/buy/%s' % (plan,)
+        return self.request('GET', ep)
+
+    def package_cancel(self, mbpkgid):
+        '''Cancel a server billing package'''
+        self._packages = None  # clear cache
+        ep = '/cloud/cancel'
+        return self.request('POST', ep, mbpkgid=mbpkgid)
+
+    def package_unlink(self, mbpkgid):
+        '''Unlink a server billing package from its location'''
+        self._packages = None  # clear cache
+        ep = '/cloud/unlink'
+        return self.request('GET', ep, in_query=True, mbpkgid=mbpkgid)
 
     @property
     def locations(self):
@@ -87,6 +105,28 @@ class HVCloud(object):
     def servers(self):
         '''List all servers'''
         return self.request('GET', '/cloud/servers')
+
+    def server_build(self, mbpkgid, fqdn, location, image, **params):
+        '''Deploy a server on a given package'''
+        loc_id = self.location_id(location)
+        ep = "/cloud/server/build/%s" % (mbpkgid,)
+        return self.request('POST', ep,
+                            fqdn=fqdn, location=loc_id, image=image, **params)
+
+    def server_delete(self, mbpkgid):
+        '''Delete (terminate) a server'''
+        ep = '/cloud/server/delete/%s' % (mbpkgid,)
+        return self.request('POST', ep)
+
+    def server_start(self, mbpkgid):
+        '''Server power on'''
+        ep = '/cloud/server/start/%s' % (mbpkgid,)
+        return self.request('POST', ep)
+
+    def server_shutdown(self, mbpkgid):
+        '''Server power off'''
+        ep = '/cloud/server/shutdown/%s' % (mbpkgid,)
+        return self.request('POST', ep)
 
     def _server_test_condition(self, mbpkgid, condition_fn):
         try:
