@@ -20,6 +20,8 @@ class HVCloud(object):
             self._key = os.environ.get('HV_API_KEY', '')
         self._locations = None  # lazy evaluated, cached
         self._packages = None  # lazy evaluated, cached
+        self._plans = None  # lazy evaluated, cached
+        self._images = None  # lazy evaluated, cached
 
     @staticmethod
     def _request(op, url, in_query, params):
@@ -46,6 +48,20 @@ class HVCloud(object):
             msg = 'Failed %s %s - (%s) %s' % (op, ep, resp.status_code, err)
             raise HVException(msg)
         return resp.json()
+
+    def images(self):
+        '''List deployable images'''
+        # lazy evaluation; cached
+        if not self._images:
+            self._images = self.request('GET', '/cloud/images')
+        return self._images
+
+    def plans(self):
+        '''List available billing plans'''
+        # lazy evaluation; cached
+        if not self._plans:
+            self._plans = self.request('GET', '/cloud/sizes')
+        return self._plans
 
     def packages(self):
         '''List all packages'''
