@@ -47,7 +47,6 @@ class HVCloud(object):
             raise HVException(msg)
         return resp.json()
 
-    @property
     def packages(self):
         '''List all packages'''
         # lazy evaluation; cached
@@ -61,7 +60,7 @@ class HVCloud(object):
             return (pkg.get('package_status') == 'Active' and
                     pkg.get('package') is None and
                     pkg.get('state') is None)
-        return (p for p in self.packages if _is_available(p))
+        return [p for p in self.packages() if _is_available(p)]
 
     def package_buy(self, plan):
         '''Buy a server billing package'''
@@ -81,7 +80,6 @@ class HVCloud(object):
         ep = '/cloud/unlink'
         return self.request('GET', ep, in_query=True, mbpkgid=mbpkgid)
 
-    @property
     def locations(self):
         '''List all locations'''
         # lazy evaluation; cached during self's lifetime
@@ -97,7 +95,7 @@ class HVCloud(object):
         '''Return location ID given its letter code'''
         code = code.upper()
         try:
-            loc_id = self.locations[code]['id']
+            loc_id = self.locations()[code]['id']
         except KeyError:
             raise HVException('No such location %s' % (code,))
         return loc_id
