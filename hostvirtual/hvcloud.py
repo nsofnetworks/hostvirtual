@@ -14,7 +14,7 @@ class HVCloud(object):
 
     HV_API_ENDPOINT = 'http://bapi.vr.org'
 
-    def __init__(self, api_key):
+    def __init__(self, api_key=None):
         self._key = api_key
         if self._key is None:
             self._key = os.environ.get('HV_API_KEY', '')
