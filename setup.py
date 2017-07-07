@@ -9,6 +9,7 @@ setup(
     install_requires=['requests'],
     description='HostVirtual API Client',
     long_description=open('README.rst').read().strip(),
+    url='https://github.com/nsofnetworks/hostvirtual.git',
     author='Shmulik Ladkani',
     author_email='shmulik@nsof.io',
     license=open('LICENSE').read(),
@@ -20,6 +21,7 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Utilities',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     keywords='hostvirtual netactuate'
