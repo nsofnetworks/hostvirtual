@@ -25,7 +25,7 @@ class HVCloud(object):
 
     @staticmethod
     def _request(op, url, in_query, params):
-        kwargs = dict(url=url, timeout=5)
+        kwargs = dict(url=url, timeout=(3.1, 29))
         kwargs['params' if in_query else 'json'] = params
         return requests.request(op, **kwargs)
 
