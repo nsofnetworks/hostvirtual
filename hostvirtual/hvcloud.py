@@ -24,22 +24,22 @@ class HVCloud(object):
         self._images = None  # lazy evaluated, cached
 
     @staticmethod
-    def _request(op, url, in_query, params):
+    def _request(op, url, in_query, req_params):
         kwargs = dict(url=url, timeout=(3.1, 29))
-        kwargs['params' if in_query else 'json'] = params
+        kwargs['params' if in_query else 'json'] = req_params
         return requests.request(op, **kwargs)
 
     @staticmethod
-    def _sanitize(params):
-        for k in list(params):
-            if params[k] is None:
-                del params[k]
+    def _sanitize(req_params):
+        for k in list(req_params):
+            if req_params[k] is None:
+                del req_params[k]
 
-    def request(self, op, ep, in_query=False, **params):
+    def request(self, op, ep, in_query=False, **req_params):
         '''Issue an API request'''
-        self._sanitize(params)
+        self._sanitize(req_params)
         url = "%s%s?key=%s" % (self.HV_API_ENDPOINT, ep, self._key)
-        resp = self._request(op, url, in_query, params)
+        resp = self._request(op, url, in_query, req_params)
         if not resp.ok:
             try:
                 err = resp.json()['error']['message']
@@ -121,12 +121,12 @@ class HVCloud(object):
         '''List all servers'''
         return self.request('GET', '/cloud/servers')
 
-    def server_build(self, mbpkgid, fqdn, location, image, **params):
+    def server_build(self, mbpkgid, fqdn, location, image, **kwargs):
         '''Deploy a server on a given package'''
         loc_id = self.location_id(location)
         ep = "/cloud/server/build/%s" % (mbpkgid,)
         return self.request('POST', ep,
-                            fqdn=fqdn, location=loc_id, image=image, **params)
+                            fqdn=fqdn, location=loc_id, image=image, **kwargs)
 
     def server_delete(self, mbpkgid):
         '''Delete (terminate) a server'''
@@ -160,14 +160,14 @@ class HVCloud(object):
         msg = 'Timed out waiting on server (mbpkgid=%s)' % (mbpkgid,)
         raise HVException(msg)
 
-    def server_modify(self, mbpkgid, **params):
+    def server_modify(self, mbpkgid, **kwargs):
         '''Modify server parameters'''
         srv = self.request('GET', '/cloud/server/%s' % (mbpkgid,))
-        for p, v in params.iteritems():
+        for p, v in kwargs.iteritems():
             if srv.get(p) != v:
                 break
         else:
             return srv  # nothing to modify
 
-        srv.update(params)
+        srv.update(kwargs)
         return self.request('PUT', '/cloud/server/%s' % (mbpkgid,), **srv)
