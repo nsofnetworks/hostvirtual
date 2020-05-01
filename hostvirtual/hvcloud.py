@@ -78,12 +78,15 @@ class HVCloud(object):
                     pkg.get('state') is None)
         return [p for p in self.packages() if _is_available(p)]
 
-    def package_buy(self, plan, package_billing=None):
+    def package_buy(self, plan, package_billing=None,
+                    package_billing_contract_id=None):
         '''Buy a server billing package'''
+        contract_id = package_billing_contract_id
         self._packages = None  # clear cache
         ep = '/cloud/buy/%s' % (plan,)
         return self.request('GET', ep, in_query=True,
-                            package_billing=package_billing)
+                            package_billing=package_billing,
+                            package_billing_contract_id=contract_id)
 
     def package_cancel(self, mbpkgid):
         '''Cancel a server billing package'''
