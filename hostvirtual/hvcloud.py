@@ -1,6 +1,7 @@
 '''Python module for the HostVirtual Cloud API'''
 import os
 import time
+import json
 import requests
 
 
@@ -174,3 +175,13 @@ class HVCloud(object):
 
         srv.update(kwargs)
         return self.request('PUT', '/cloud/server/%s' % (mbpkgid,), **srv)
+
+    def bgp_sessions(self):
+        '''List BGP Sessions'''
+        res = self.request('GET', '/cloud/bgpsessions2')
+        sessions = res.get('sessions', [])
+        for s in sessions:
+            rr = s.get('routes_received')
+            if rr is not None:
+                s['routes_received'] = json.loads(rr)
+        return sessions
