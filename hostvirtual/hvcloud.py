@@ -1,5 +1,6 @@
 '''Python module for the HostVirtual Cloud API'''
 import os
+import sys
 import time
 import json
 import requests
@@ -107,7 +108,7 @@ class HVCloud(object):
         if not self._locations:
             self._locations = {}
             ret = self.request('GET', '/cloud/locations')
-            for k, loc in ret.iteritems():
+            for k, loc in (ret.items() if sys.version_info[0] == 3 else ret.iteritems()):
                 code = k.split(' - ', 1)[0].upper()
                 self._locations[code] = loc
         return self._locations
@@ -156,7 +157,7 @@ class HVCloud(object):
 
     def server_wait_for(self, mbpkgid, condition_fn):
         '''Wait for server to match a condition'''
-        for _ in xrange(60):
+        for _ in (range(60) if sys.version_info[0] == 3 else xrange(60)):
             srv = self._server_test_condition(mbpkgid, condition_fn)
             if srv:
                 return srv
@@ -167,7 +168,7 @@ class HVCloud(object):
     def server_modify(self, mbpkgid, **kwargs):
         '''Modify server parameters'''
         srv = self.request('GET', '/cloud/server/%s' % (mbpkgid,))
-        for p, v in kwargs.iteritems():
+        for p, v in (kwargs.items() if sys.version_info[0] == 3 else kwargs.iteritems()):
             if srv.get(p) != v:
                 break
         else:
