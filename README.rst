@@ -9,7 +9,7 @@ Installation
 
 .. code-block:: bash
 
-    $ sudo pip install .
+    $ sudo pip3 install .
 
 
 Usage
