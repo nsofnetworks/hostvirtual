@@ -13,7 +13,7 @@ class HVException(RuntimeError):
 class HVCloud(object):
     '''Client for HostVirtual Cloud API'''
 
-    HV_API_ENDPOINT = 'http://bapi.vr.org'
+    HV_API_ENDPOINT = 'https://api.netactuate.com'
 
     def __init__(self, api_key=None):
         self._key = api_key
